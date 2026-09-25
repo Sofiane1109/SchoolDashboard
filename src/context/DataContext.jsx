@@ -1,5 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { assignmentsApi, coursesApi, dailyTasksApi, isDemoMode } from '../services/api'
+import { useAuth } from '../hooks/useAuth'
 
 export const DataContext = createContext(null)
 
@@ -11,8 +12,12 @@ export function DataProvider({ children }) {
   const [dailyTasks, setDailyTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const { user } = useAuth()
+  const userId = user?.id ?? null
+  const canLoad = isDemoMode || Boolean(userId)
 
   const reload = useCallback(async () => {
+    if (!canLoad) return
     setLoading(true)
     setError(null)
     try {
@@ -25,11 +30,19 @@ export function DataProvider({ children }) {
     } finally {
       setLoading(false)
     }
-  }, [])
+    // userId is a dependency so switching accounts refetches.
+  }, [canLoad, userId])
 
   useEffect(() => {
-    reload()
-  }, [reload])
+    if (canLoad) {
+      reload()
+      return
+    }
+    setCourses([])
+    setAssignments([])
+    setDailyTasks([])
+    setError(null)
+  }, [canLoad, reload])
 
   // Runs a mutation; on failure shows the error and restores the previous state.
   const run = useCallback(async (fn, rollback) => {

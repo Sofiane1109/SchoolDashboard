@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { AlertTriangle, GraduationCap, Info, X } from 'lucide-react'
 import { NAV_ITEMS } from './navItems'
 import { ThemeCycleButton, ThemeSegmented } from './ThemeToggle'
+import { MobileUserMenu, SidebarUserMenu } from './UserMenu'
 import { useData } from '../../hooks/useData'
 
 function Brand() {
@@ -40,6 +41,7 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
+      <SidebarUserMenu />
       <ThemeSegmented />
     </aside>
   )
@@ -49,7 +51,10 @@ function MobileTopBar() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 lg:hidden">
       <Brand />
-      <ThemeCycleButton />
+      <div className="flex items-center gap-1">
+        <ThemeCycleButton />
+        <MobileUserMenu />
+      </div>
     </header>
   )
 }
